@@ -1,3 +1,21 @@
+table {
+	width: 100%;
+}
 tr {
 	vertical-align: top;
+}
+td {
+	text-align: center;
+	width: 50%;
+}
+textarea {
+	resize: none;
+}
+code {
+	color: red;
+}
+pre {
+	color: white;
+	background-color: #333;
+	padding: 10px;
 }

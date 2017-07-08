@@ -1,6 +1,11 @@
 <h1>
-  {{title}}
+	{{title}}
 </h1>
+<hr>
+	<form (ngSubmit)="onGenerateKeyPair()">
+		<label for="keysize">Key Size</label> <input name="keysize" id="keysize" [(ngModel)]="keysize" type="number" /> <button type="submit">Generate new RSA keys</button>
+	</form>
+<br>
 <table>
 	<thead>
 		<tr>
@@ -15,11 +20,61 @@
 	<tbody>
 		<tr>
 			<td>
-				<pre>{{keypair?.pub}}</pre>
+				<textarea [(ngModel)]="keypair.pub" cols="75" rows="27"></textarea>
 			</td>
 			<td>
-				<pre>{{keypair?.priv}}</pre>
+				<textarea [(ngModel)]="keypair.priv" cols="75" rows="27"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<textarea [(ngModel)]="plaintext" cols="75" rows="5"></textarea>
+			</td>
+			<td>
+				<textarea [(ngModel)]="ciphertext" cols="75" rows="5"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<button (click)="onEncrypt()">Encrypt</button>
+			</td>
+			<td>
+				<button (click)="onDecrypt()">Decrypt</button>
 			</td>
 		</tr>
 	</tbody>
 </table>
+<hr>
+<h3>Encrypting using OpenSSL</h3>
+<p>
+	To encrypt using the public key and OpenSSL, you must first copy the public key generated above into a file <code>pub.pem</code>.
+	Then you must have a message no larger than the key size ({{keysize}} bits) in another file <code>plaintext.txt</code>.
+	The output must be in base64 in order to use this utility.
+</p>
+<p>
+	Run the following command to encrypt <code>plaintext.txt</code>
+</p>
+<pre>OpenSSL rsautl -encrypt -inkey pub.pem -pubin -in plaintext.txt | base64</pre>
+<p>You can take the output of the above command and decrypt it with this utility!</p>
+<h3>Decrypting using OpenSSL</h3>
+<p>
+	First, you must begin by encrypting a short message, no larger than the key size ({{keysize}} bits) using this utility. It
+	will return the ciphertext in base64. Copy that into a file <code>ciphertext.txt</code> before converting it into a binary
+	file <code>cipertext.bin</code>. After converting it, copy the private key into a file <code>priv.pem</code> and use OpenSSL
+	to decrypt it.
+</p>
+<p>
+	Run the following command to convert <code>ciphertext.txt</code> to binary:
+</p>
+<pre>base64 -d ciphertext.txt > ciphertext.bin</pre>
+<p>
+	Run the following command to decrypt <code>ciphertext.bin</code>
+</p>
+<pre>OpenSSL rsautl -decrypt -inkey priv.pem -in ciphertext.bin</pre>
+<h3>Generating your own keys with OpenSSL</h3>
+<p>First you must generate a private key using OpenSSL. Then you use OpenSSL to extract the public key.</p>
+<p>Generating a private key:</p>
+<pre>openssl genrsa -out priv.pem 2048</pre>
+<p>Extracting the public key:</p>
+<pre>openssl rsa -in private.pem -outform PEM -pubout -out pub.pem</pre>
+<hr>
